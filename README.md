@@ -39,6 +39,11 @@ python --and-search search_disaster_events.py 雨 雷
 python search_disaster_events.py -s 日本
 ```
 
+原出典が「扶桑略記23」であるデータを抽出する場合
+```
+python search_disaster_events.py -s 扶桑略記23 --strict-s
+```
+
 ## **オプション一覧**
 
 | オプション     | 説明                           |
