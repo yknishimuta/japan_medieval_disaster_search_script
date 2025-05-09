@@ -5,11 +5,12 @@ import argparse
 input_file_path = "./cmdjm-latest.csv" 
 output_path = "./outputs/search_results.csv"
 gregorian_col_name = 'グレゴリオ暦'
+region_col_name = '地域'
 source_col_name = '原出典'
 bibliography_col_name = '掲載書誌'
 event_col_name = '天変地異などの記事'
 
-def filter_data(file_path, event_keywords=None, source_name=None, bibliography_name=None, min_year=None, max_year=None,
+def filter_data(file_path, event_keywords=None, region_name=None, source_name=None, bibliography_name=None, min_year=None, max_year=None,
                 source_exact_match=False, bibliography_exact_match=False, and_search=False):
 
     df = pd.read_csv(file_path, header=0, encoding='utf-8') 
@@ -24,6 +25,9 @@ def filter_data(file_path, event_keywords=None, source_name=None, bibliography_n
             df = df[df[event_col_name].apply(lambda x: all(kw in x for kw in keywords_list))]
         else:
             df = df[df[event_col_name].apply(lambda x: any(kw in x for kw in keywords_list))]
+
+    if region_name:
+      df = df[df[region_col_name].str.contains(region_name)]
 
     if source_name:
         if source_exact_match:
@@ -83,6 +87,7 @@ def validate_and_search(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="『日本中世気象災害史年表稿』の詳細検索スクリプト")
     parser.add_argument("event_keywords", nargs="*", default=None, help="検索する天変地異などの記事のキーワード（複数可）")
+    parser.add_argument("-r", dest="region_name", type=str, default=None, help="地域の検索ワード")
     parser.add_argument("-s", dest="source_name", type=str, default=None, help="原出典の検索ワード（部分一致）")
     parser.add_argument("--strict-s", dest="source_exact_match", action="store_true", help="原出典の完全一致検索を有効にする")
     parser.add_argument("-b", dest="bibliography_name", type=str, default=None, help="掲載書誌の検索ワード（部分一致）")
@@ -97,7 +102,7 @@ if __name__ == "__main__":
     validate_bibliography_name(args)
     validate_and_search(args)
     
-    filtered_data = filter_data(input_file_path, args.event_keywords, args.source_name, args.bibliography_name,
+    filtered_data = filter_data(input_file_path, args.event_keywords, args.region_name, args.source_name, args.bibliography_name,
                         args.min_year, args.max_year, source_exact_match=args.source_exact_match,
                         bibliography_exact_match=args.bibliography_exact_match, and_search=args.and_search)
     
